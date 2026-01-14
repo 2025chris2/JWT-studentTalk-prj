@@ -1,47 +1,27 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
+import { useDark, useToggle } from "@vueuse/core";
+
+// ✅ 正确：只调用一次 useDark，并用变量接收
+const isDark = useDark({
+  selector: 'html',
+  attribute: 'class',
+  valueDark: 'dark',
+  valueLight: 'light'
+})
+
+// ✅ 正确：使用 useToggle 创建切换函数
+const toggleDark = useToggle(isDark)
+
+// 🎯 如果你想跟随系统主题，可以添加这个（可选）
+// usePreferredDark() // 监听系统主题变化
 </script>
 
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-    </div>
-  </header>
-
-  <main>
-    <TheWelcome />
-  </main>
+  <div>
+    <!-- 添加一个切换按钮 -->
+    <button @click="toggleDark()" style="position: fixed; top: 20px; right: 20px; z-index: 999">
+      {{ isDark ? '☀️ 浅色模式' : '🌙 深色模式' }}
+    </button>
+    <router-view/>
+  </div>
 </template>
-
-<style scoped>
-header {
-  line-height: 1.5;
-}
-
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-}
-</style>
