@@ -12,7 +12,7 @@ import java.util.Date;
 @TableName("db_account")
 @Data
 @AllArgsConstructor
-public class Account {
+public class Account implements com.example.entity.BaseData {
     @TableId(type = IdType.AUTO)
     Integer id;
     String username;

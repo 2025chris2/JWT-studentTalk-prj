@@ -1,6 +1,7 @@
 package com.test.filter;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.test.utils.Const;
 import com.test.utils.JwtUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -35,7 +36,7 @@ public class JwtAuthorizeFilter extends OncePerRequestFilter {
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user,null,user.getAuthorities());
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            request.setAttribute("id",utils.toId(jwt));
+            request.setAttribute(Const.ATTR_USER_ID,utils.toId(jwt));
         }
         filterChain.doFilter(request,response);
 

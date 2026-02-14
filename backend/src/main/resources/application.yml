@@ -1,4 +1,9 @@
 spring:
+  data:
+    redis:
+      host: localhost
+      port: 9091
+      password: 123456
   mail:
     host: smtp.163.com
     username: tzltangzilong2023@163.com
@@ -8,10 +13,6 @@ spring:
     username: admin
     password: admin
     virtual-host: /test
-
-
-
-
   security:
     filter:
       order: -100
