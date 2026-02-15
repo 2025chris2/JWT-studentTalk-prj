@@ -88,7 +88,7 @@ function userLogout(){
             <el-scrollbar style="height: calc(100vh - 55px)">
               <el-menu
                   style="min-height: 100vh"
-                  :default-active="$router.path"
+                  :default-active="$route.path"
                   router>
                 <!-- 校园论坛 -->
                 <el-sub-menu index="1">

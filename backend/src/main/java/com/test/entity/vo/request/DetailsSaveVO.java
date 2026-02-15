@@ -13,7 +13,7 @@ public class DetailsSaveVO {
     String username;
     @Max(value = 1,message = "性别只能是0或1")
             @Min(value = 0,message = "性别只能是0或1")
-     int gender;
+     Integer gender;
     @Pattern(regexp = "^1[3-9]\\d{9}$",message = "手机号格式不正确!")
             @Length(max= 11)
     String phone;

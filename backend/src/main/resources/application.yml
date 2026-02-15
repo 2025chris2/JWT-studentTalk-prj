@@ -2,7 +2,7 @@ spring:
   data:
     redis:
       host: localhost
-      port: 9091
+      port: 6379
       password: 123456
   mail:
     host: smtp.163.com

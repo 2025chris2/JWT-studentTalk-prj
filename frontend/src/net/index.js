@@ -48,7 +48,15 @@ function internalPost(url, data, header, success, failure, error=defaultError) {
         else{
             failure(data.message)
         }
-    }).catch(err => error(err))
+    }).catch(err => {
+        // HTTP 错误也转给 failure 处理
+        if (err.response?.data) {
+            // 后端返回了错误体
+            failure(err.response.data.message, err.response.status, url);
+        } else {
+            error(err);
+        }
+    });
 }
 
 function internalGet(url, header, success, failure, error=defaultError) {
@@ -82,7 +90,6 @@ function post(url, data, success, failure= defaultFailure){
 
 function accessHeader(){
     const token = takeAccessToken();
-
     return token?{
         'Authorization': `Bearer ${takeAccessToken()}`
     }:{};
