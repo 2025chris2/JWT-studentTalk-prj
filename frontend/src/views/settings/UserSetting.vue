@@ -3,9 +3,10 @@
 import Card from "@/components/Card.vue";
 import {Message, Refresh, Select, User} from "@element-plus/icons-vue";
 import {useStore} from "@/store/index.js";
-import {computed, reactive, ref} from "vue";
+import {computed, onMounted, reactive, ref} from "vue";
 import {ElMessage} from "element-plus";
 import {get, post} from "@/net/index.js";
+
 
 const desc = ref('')
 const baseFormRef = ref()
@@ -40,10 +41,10 @@ const rules = {
     { validator: validateUsername, trigger: [ 'blur', 'change']},
     { min: 2, max: 10, message: '用户名必须在2~10个字符之间!', trigger: [ 'blur', 'change']}
   ],email: [
-    { require: true, message: '请输入邮件地址!', trigger: [ 'blur']},
+    { required: true, message: '请输入邮件地址!', trigger: [ 'blur']},
     { type: 'email', message: '请输入合法的邮件地址!', trigger: [ 'blur', 'change']},
   ],code: [
-    { require: true, message: '请输入验证码!', trigger: [ 'blur']}
+    { required: true, message: '请输入验证码!', trigger: [ 'blur']}
   ]
 }
 
@@ -74,15 +75,27 @@ function saveDetails(){
   })
 }
 
-get('/api/user/details', data=>{
-  baseForm.username = store.user.username;
-  baseForm.gender = data.gender;
-  baseForm.phone = data.phone;
-  baseForm.wx = data.wx;
-  baseForm.qq = data.qq
-  baseForm.desc = desc.value = data.desc
-  emailForm.email = store.user.email
-  loading.form = false
+// 将请求放在 onMounted 中
+onMounted(() => {
+  console.log('组件挂载，准备获取用户详情')
+
+  get('/api/user/details',
+      data => {
+        console.log('获取数据成功:', data)  // 调试用
+        baseForm.username = store.user.username;
+        baseForm.gender = data.gender;
+        baseForm.phone = data.phone;
+        baseForm.wx = data.wx;
+        baseForm.qq = data.qq
+        baseForm.desc = desc.value = data.desc
+        emailForm.email = store.user.email
+        loading.form = false
+      },
+      (message, code) => {  // 添加 failure 回调来查看错误
+        console.error('获取用户详情失败:', message, '状态码:', code)
+        loading.form = false
+      }
+  )
 })
 
 const coldTime = ref(0)
@@ -157,9 +170,9 @@ function modifyEmail(){
         <el-form-item label="电子邮件" prop="email">
           <el-input  v-model="emailForm.email"/>
         </el-form-item>
-        <el-form-item>
+        <el-form-item prop="code">
           <el-row style="width: 100%;" :gutter="10">
-            <el-col :span="18" prop="code">
+            <el-col :span="18">
               <el-input placeholder="请获取验证码!"  v-model="emailForm.code"/>
             </el-col>
             <el-col :span="6">

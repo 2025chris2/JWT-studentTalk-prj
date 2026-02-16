@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class AccountDetailsVO {
-    int gender;
+    Integer gender;
     String phone;
     String qq;
     String wx;

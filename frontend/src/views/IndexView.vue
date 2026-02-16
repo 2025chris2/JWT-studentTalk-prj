@@ -157,7 +157,7 @@ function userLogout(){
                     <el-icon><User /></el-icon>
                     <span>个人信息设置</span>
                   </el-menu-item>
-                  <el-menu-item index="">
+                  <el-menu-item index="/index/privacy-setting">
                     <el-icon><Lock /></el-icon>
                     <span>账号安全设置</span>
                   </el-menu-item>
