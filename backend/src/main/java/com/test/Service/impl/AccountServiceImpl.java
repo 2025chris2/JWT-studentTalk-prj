@@ -7,6 +7,7 @@ import com.test.entity.dto.Account;
 import com.test.entity.vo.request.ConfirmResetVO;
 import com.test.entity.vo.request.EmailRegisterVO;
 import com.test.entity.vo.request.EmailResetVO;
+import com.test.entity.vo.request.ModifyEmailVO;
 import com.test.mapper.AccountMapper;
 import com.test.utils.Const;
 import com.test.utils.FlowUtils;
@@ -63,6 +64,23 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
         if(update){
             stringRedisTemplate.delete(Const.VERIFY_EMAIL_DATA +email);
         }
+        return null;
+    }
+
+    @Override
+    public String modifyEmail(int id, ModifyEmailVO vo) {
+        String email = vo.getEmail();
+        String code = getEmailVerifyCode(email);
+        if(code == null) return "请先获取验证码";
+        if(code.equals(email)) return "验证码错误，请重新输入!";
+        this.deleteEmailVerifyCode(email);
+        Account account = this.findAccountByNameOrEmail(email);
+        if(account != null && account.getId()!=id)
+            return "该邮箱已经被绑定!";
+        this.update()
+                .eq("id",id)
+                .set("email",email)
+                .update();
         return null;
     }
 
@@ -141,4 +159,25 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
         String key = Const.VERIFY_EMAIL_DATA + ip;
         return utils.limitOnceCheck(key, 60);
     }
+
+    /**
+     * 获取Redis中存储的邮件验证码
+     * @param email 电邮
+     * @return 验证码
+     */
+    private String getEmailVerifyCode(String email){
+        String key = Const.VERIFY_EMAIL_DATA + email;
+        return stringRedisTemplate.opsForValue().get(key);
+    }
+
+    /**
+     * 移除Redis中存储的邮件验证码
+     * @param email 电邮
+     */
+    private void deleteEmailVerifyCode(String email){
+        String key = Const.VERIFY_EMAIL_DATA + email;
+        stringRedisTemplate.delete(key);
+    }
+
+
 }

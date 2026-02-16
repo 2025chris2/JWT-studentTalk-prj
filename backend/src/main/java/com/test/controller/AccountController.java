@@ -6,6 +6,7 @@ import com.test.entity.RestBean;
 import com.test.entity.dto.Account;
 import com.test.entity.dto.AccountDetails;
 import com.test.entity.vo.request.DetailsSaveVO;
+import com.test.entity.vo.request.ModifyEmailVO;
 import com.test.entity.vo.response.AccountDetailsVO;
 import com.test.entity.vo.response.AccountVO;
 import com.test.utils.Const;
@@ -45,5 +46,12 @@ public class AccountController {
                                       @RequestBody @Valid DetailsSaveVO vo){
         boolean success = detailsService.saveAccountDetails(id ,vo);
         return success ? RestBean.success() : RestBean.failure(400, "此用户名已被使用，请更换！");
+    }
+
+    @PostMapping("/modify-email")
+    public RestBean<Void> modifyEmail(@RequestAttribute (Const.ATTR_USER_ID) int id,
+                                      @RequestBody @Valid ModifyEmailVO vo){
+        String result = service.modifyEmail(id,vo);
+        return result == null ? RestBean.success() : RestBean.failure(400,result);
     }
 }
