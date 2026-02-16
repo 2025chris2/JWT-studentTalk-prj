@@ -4,10 +4,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.test.Service.AccountService;
 import com.test.entity.dto.Account;
-import com.test.entity.vo.request.ConfirmResetVO;
-import com.test.entity.vo.request.EmailRegisterVO;
-import com.test.entity.vo.request.EmailResetVO;
-import com.test.entity.vo.request.ModifyEmailVO;
+import com.test.entity.vo.request.*;
 import com.test.mapper.AccountMapper;
 import com.test.utils.Const;
 import com.test.utils.FlowUtils;
@@ -39,6 +36,8 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
 
     @Autowired
     PasswordEncoder encoder;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -82,6 +81,18 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
                 .set("email",email)
                 .update();
         return null;
+    }
+
+    @Override
+    public String changePassword(int id, ChangePasswordVO vo) {
+        String password = this.query().eq("id",id).one().getPassword();
+        if(!passwordEncoder.matches(vo.getPassword(),password))
+            return "原密码错误，请重新输入密码!";
+        boolean success = this.update()
+                .eq("id",id)
+                .set("password",passwordEncoder.encode(vo.getNew_password()))
+                .update();
+        return success ? null : "未知错误，请联系管理员!";
     }
 
     @Override

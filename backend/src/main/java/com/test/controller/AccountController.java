@@ -5,6 +5,7 @@ import com.test.Service.AccountService;
 import com.test.entity.RestBean;
 import com.test.entity.dto.Account;
 import com.test.entity.dto.AccountDetails;
+import com.test.entity.vo.request.ChangePasswordVO;
 import com.test.entity.vo.request.DetailsSaveVO;
 import com.test.entity.vo.request.ModifyEmailVO;
 import com.test.entity.vo.response.AccountDetailsVO;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
+import java.util.function.Supplier;
 
 
 @RestController
@@ -51,7 +53,21 @@ public class AccountController {
     @PostMapping("/modify-email")
     public RestBean<Void> modifyEmail(@RequestAttribute (Const.ATTR_USER_ID) int id,
                                       @RequestBody @Valid ModifyEmailVO vo){
-        String result = service.modifyEmail(id,vo);
-        return result == null ? RestBean.success() : RestBean.failure(400,result);
+        return this.messageHandle(()->service.modifyEmail(id,vo));
     }
+
+    @PostMapping("/change-password")
+    public RestBean<Void> changePassword(@RequestAttribute (Const.ATTR_USER_ID) int id,
+                                         @RequestBody @Valid ChangePasswordVO vo){
+        return this.messageHandle(()->service.changePassword(id,vo));
+    }
+
+    public  <T> RestBean<T> messageHandle(Supplier<String> action){
+        String message = action.get();
+        if(message == null)
+            return RestBean.success();
+        else
+            return RestBean.failure(400, message);
+    }
+
 }
