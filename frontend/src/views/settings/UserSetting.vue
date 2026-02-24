@@ -106,38 +106,42 @@ const onValidate = (prop,isValid)=>{
 }
 function sendEmailCode(){
   emailFormRef.value.validate(isValid=>{
-    coldTime.value = 60
-    get(`/api/auth/ask-code?email=${emailForm.email}&type=modify`,()=>{
-      ElMessage(`验证码已成功发送到邮箱${emailForm.email},请注意查收!`)
-      const handle = setInterval(()=>{
-        coldTime.value--
-        if( coldTime.value === 0) {
-          clearInterval(handle)
-        }
-      },1000)
-    },(message)=>{
-      ElMessage.warning(message)
-      coldTime.value = 0
-    })
+    if(isValid){
+      coldTime.value = 60
+      get(`/api/auth/ask-code?email=${emailForm.email}&type=modify`,()=>{
+        ElMessage(`验证码已成功发送到邮箱${emailForm.email},请注意查收!`)
+        const handle = setInterval(()=>{
+          coldTime.value--
+          if( coldTime.value === 0) {
+            clearInterval(handle)
+          }
+        },1000)
+      },(message)=>{
+        ElMessage.warning(message)
+        coldTime.value = 0
+      })
+    }
   })
 }
 
 function modifyEmail(){
   emailFormRef.value.validate(isValid=>{
-    post("/api/user/modify-email",emailForm,()=>{
-      ElMessage.success("邮件修改成功!")
-      store.user.email = emailForm.email
-      emailForm.code = ''
-    })
+    if(isValid){
+      post("/api/user/modify-email",emailForm,()=>{
+        ElMessage.success("邮件修改成功!")
+        store.user.email = emailForm.email
+        emailForm.code = ''
+      })
+    }
   })
-
 }
+
 </script>
 
 <template>
  <div style="display: flex">
   <div class="setting-left">
-    <card v-loading="loading.form" :icon="User" title="账号信息设置" desc="在这里编辑您的个人信息，您可以在隐私设置中选择是否展示这些信息">
+    <card v-loading="loading.form" :icon="User" title="账号信息设置"  desc="在这里编辑您的个人信息，您可以在隐私设置中选择是否展示这些信息">
       <el-form ref="baseFormRef" :rules="rules" :model="baseForm" label-position="top" style="margin: 0 10px 10px 10px">
         <el-form-item label="用户名" prop="username">
           <el-input v-model="baseForm.username" maxlength="10"/>

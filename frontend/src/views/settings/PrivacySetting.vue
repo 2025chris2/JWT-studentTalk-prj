@@ -4,7 +4,7 @@ import {Setting, Switch,Lock} from "@element-plus/icons-vue";
 import Card from "@/components/Card.vue";
 import {computed, reactive, ref} from "vue";
 import {ElMessage} from "element-plus";
-import {post} from "@/net/index.js";
+import {get, post} from "@/net/index.js";
 
 const form = reactive({
   password: '',
@@ -48,18 +48,48 @@ function resetPassword(){
     }
   })
 }
+
+
+const privacy = reactive({
+  phone: false,
+  wx: false,
+  qq: false,
+  email: false,
+  gender: false
+})
+
+const saving = ref(true)
+get('/api/user/privacy',data=>{
+  privacy.email = data.email;
+  privacy.qq = data.qq;
+  privacy.phone = data.phone;
+  privacy.wx = data.wx;
+  privacy.gender = data.gender;
+  saving.value = false
+})
+
+function savePrivacy(type, status){
+  saving.value = true;
+  post('api/user/save-privacy',{
+    type: type,
+    status: status
+  },()=>{
+    ElMessage.success("隐私设置修改成功！")
+    saving.value = false
+  })
+}
 </script>
 
 <template>
   <div>
     <div style="margin-top: 20px">
-      <card :icon="Setting" title="隐私设置" desc="在这里可以设置哪些内容可以被其他人看见，请小伙伴们注重自己的隐私!">
+      <card v-loading="saving" :icon="Setting" title="隐私设置" desc="在这里可以设置哪些内容可以被其他人看见，请小伙伴们注重自己的隐私!">
         <div class="checkbox-list">
-          <el-checkbox>公开展示我的手机号</el-checkbox>
-          <el-checkbox>公开展示我的电子邮件地址</el-checkbox>
-          <el-checkbox>公开展示我的qq</el-checkbox>
-          <el-checkbox>公开展示我的微信号</el-checkbox>
-          <el-checkbox>公开展示我的性别</el-checkbox>
+          <el-checkbox v-model="privacy.phone" @change="savePrivacy('phone',privacy.phone)">公开展示我的手机号</el-checkbox>
+          <el-checkbox v-model="privacy.email" @change="savePrivacy('email',privacy.email)">公开展示我的电子邮件地址</el-checkbox>
+          <el-checkbox v-model="privacy.qq" @change="savePrivacy('qq',privacy.qq)">公开展示我的qq</el-checkbox>
+          <el-checkbox v-model="privacy.wx" @change="savePrivacy('wx',privacy.wx)">公开展示我的微信号</el-checkbox>
+          <el-checkbox v-model="privacy.gender" @change="savePrivacy('gender',privacy.gender)">公开展示我的性别</el-checkbox>
         </div>
       </card>
       <card :icon="Setting" style="margin:20px 0"
